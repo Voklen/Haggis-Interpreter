@@ -1,0 +1,6 @@
+some line
+#a comment
+#another comment
+SEND "Hello World" TO DISPLAY
+misc
+not sure what else to write
