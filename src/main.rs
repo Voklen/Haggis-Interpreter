@@ -23,7 +23,7 @@ fn run_haggis(contents: String) {
 }
 
 fn get_file() -> String {
-	let file_location = "hello_world.hggs";
+	let file_location = "hello_world.hgs";
 	std::fs::read_to_string(file_location)
 		.expect("Can't read file")
 }
@@ -67,6 +67,7 @@ BUILT IN FUNCTIONS
 */
 
 fn send(to_send: &str, words: Vec<&str>) {
+	// Check the second to last word is TO
 	let second_to_last_word = words.get(words.len().wrapping_sub(2));
 	if second_to_last_word != Some(&"TO") {
 		panic!("Syntax Error: SEND must always have a TO")
