@@ -1,6 +1,10 @@
 some line
 #a comment
 #another comment
+SET x TO "Contents of variable x"
+SET y TO "Contents of variable y"
+SEND y TO DISPLAY
 SEND "Hello World" TO DISPLAY
+SEND x TO DISPLAY
 misc
 not sure what else to write
