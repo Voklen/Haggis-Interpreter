@@ -77,18 +77,22 @@ impl Variables {
 	}
 	/// DECLARE found AS BOOLEAN INITIALLY false
 	fn declare(&mut self, line: &str, words: Vec<&str>) {
-		let (my_type, value) = match words.get(2) {
-			Some(&"AS") => (Some(words.get(3).unwrap()), words[5..].join(" ")),
-			Some(&"INITIALLY") => (None, words[3..].join(" ")),
+		let my_type = match words.get(2) {
+			Some(&"AS") => Some(words.get(3).unwrap()),
+			Some(&"INITIALLY") =>(None),
 			_ => panic!("Syntax Error: DECLARE must always have a AS")
 		};
+		let key = words[1].to_string();
+
+		const INITIALLY_LEN: usize = 11; // " INITIALLY "
+		const DECLARE_AS_LEN: usize = 12 + INITIALLY_LEN; // "DECLARE ... AS" + " INITIALLY "
+		let var_len = key.len();
 		let value = match my_type {
-			Some(&"STRING") => Types::String(evaluate_as_str(&value, self)),
-			Some(var) => panic!("Unknown variable {var}"),
+			Some(&"STRING") => Types::String(evaluate_as_str(&line[DECLARE_AS_LEN + var_len + 6..], self)),
+			Some(invalid_type) => panic!("Unknown type {invalid_type}"),
 			None => todo!("Dynamic eval")
 		};
 
-		let key = words[1].to_string();
 		self.vars.insert(key, value);
 	}
 
