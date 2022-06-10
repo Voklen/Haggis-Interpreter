@@ -1,8 +1,9 @@
 some line
 # a comment
 # another comment
-SET x TO "Contents of variable x"
-SET y TO "Contents of variable y"
+DECLARE x AS STRING INITIALLY "Hello from x"
+DECLARE y AS STRING INITIALLY "Hello from y"
+SET x TO "Modified variable x"
 SEND y TO DISPLAY
 SEND "Hello World" TO DISPLAY
 SEND x TO DISPLAY

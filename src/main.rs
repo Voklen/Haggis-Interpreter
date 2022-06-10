@@ -13,6 +13,7 @@ fn run_haggis(contents: String) {
 		match words[0] {
 			"SEND" => send(line, words, &vars),
 			"SET" => vars.set(line, words),
+			"DECLARE" => vars.declare(line, words),
 			command => println!("Unrecognized command: {command}"),
 		}
 	}
@@ -74,12 +75,32 @@ impl Variables {
 		let vars = HashMap::new();
 		Variables { vars }
 	}
+	/// DECLARE found AS BOOLEAN INITIALLY false
+	fn declare(&mut self, line: &str, words: Vec<&str>) {
+		let (my_type, value) = match words.get(2) {
+			Some(&"AS") => (Some(words.get(3).unwrap()), words[5..].join(" ")),
+			Some(&"INITIALLY") => (None, words[3..].join(" ")),
+			_ => panic!("Syntax Error: DECLARE must always have a AS")
+		};
+		let value = match my_type {
+			Some(&"STRING") => Types::String(evaluate_as_str(&value, self)),
+			Some(var) => panic!("Unknown variable {var}"),
+			None => todo!("Dynamic eval")
+		};
+
+		let key = words[1].to_string();
+		self.vars.insert(key, value);
+	}
+
 	fn set(&mut self, line: &str, words: Vec<&str>) {
 		if words.get(2) != Some(&"TO") {
 			panic!("Syntax Error: SEND must always have a TO")
 		}
 
 		let key = words[1].to_string();
+		if !self.vars.contains_key(&key) {
+			panic!("Variable Error: Variable {key} is not declared")
+		}
 		let set_value = evaluate_as_str(&line[key.len() + 8..], self); // The +8 is the SET ... TO
 		let value = Types::String(set_value);
 		self.vars.insert(key, value);
