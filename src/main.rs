@@ -9,8 +9,8 @@ fn run_haggis(contents: String) {
 		if is_comment_or_empty(line) {
 			continue;
 		}
-		let words: Vec<&str> = line.split(' ').collect();
-		match words[0] {
+		let mut words = line.split(' ');
+		match words.next().unwrap() { // Will never panic because we've already checked it's not empty
 			"SEND" => send(line, words, &vars),
 			"SET" => vars.set(line, words),
 			"DECLARE" => vars.declare(line, words),
@@ -76,19 +76,19 @@ impl Variables {
 		Variables { vars }
 	}
 	/// DECLARE found AS BOOLEAN INITIALLY false
-	fn declare(&mut self, line: &str, words: Vec<&str>) {
-		let my_type = match words.get(2) {
-			Some(&"AS") => Some(words.get(3).unwrap()),
-			Some(&"INITIALLY") =>(None),
+	fn declare(&mut self, line: &str, mut words: core::str::Split<char>) {
+		let key = words.next().unwrap().to_string();
+		let my_type = match words.next() {
+			Some("AS") => Some(words.next().unwrap()),
+			Some("INITIALLY") =>(None),
 			_ => panic!("Syntax Error: DECLARE must always have a AS")
 		};
-		let key = words[1].to_string();
 
 		const INITIALLY_LEN: usize = 11; // " INITIALLY "
 		const DECLARE_AS_LEN: usize = 12 + INITIALLY_LEN; // "DECLARE ... AS" + " INITIALLY "
 		let var_len = key.len();
 		let value = match my_type {
-			Some(&"STRING") => Types::String(evaluate_as_str(&line[DECLARE_AS_LEN + var_len + 6..], self)),
+			Some("STRING") => Types::String(evaluate_as_str(&line[DECLARE_AS_LEN + var_len + 6..], self)),
 			Some(invalid_type) => panic!("Unknown type {invalid_type}"),
 			None => todo!("Dynamic eval")
 		};
@@ -96,12 +96,12 @@ impl Variables {
 		self.vars.insert(key, value);
 	}
 
-	fn set(&mut self, line: &str, words: Vec<&str>) {
-		if words.get(2) != Some(&"TO") {
+	fn set(&mut self, line: &str, mut words: core::str::Split<char>) {
+		let key = words.next().unwrap().to_string();
+		if words.next() != Some(&"TO") {
 			panic!("Syntax Error: SEND must always have a TO")
 		}
 
-		let key = words[1].to_string();
 		if !self.vars.contains_key(&key) {
 			panic!("Variable Error: Variable {key} is not declared")
 		}
@@ -122,15 +122,16 @@ impl Variables {
 BUILT IN FUNCTIONS
 */
 
-fn send(line: &str, words: Vec<&str>, vars: &Variables) {
+fn send(line: &str, mut words: core::str::Split<char>, vars: &Variables) {
+	let last_word = words.next_back();
 	// Check the second to last word is TO
-	let second_to_last_word = words.get(words.len().wrapping_sub(2));
-	if second_to_last_word != Some(&"TO") {
+	let second_last_word = words.next_back();
+	if second_last_word != Some(&"TO") {
 		panic!("Syntax Error: SEND must always have a TO")
 	}
 	// .unwrap() should never panic as we have just checked that the second to last element exists
 	// The +2 is for the spaces between the words
-	let expr_end = second_to_last_word.unwrap().len() + words.last().unwrap().len() + 2;
+	let expr_end = second_last_word.unwrap().len() + last_word.unwrap().len() + 2;
 
 	let expression = &line[5..(line.len() - expr_end)]; // This gets everything between the SEND and the TO
 	let string = evaluate_as_str(expression, vars);
