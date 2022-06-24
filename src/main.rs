@@ -10,7 +10,8 @@ fn run_haggis(contents: String) {
 			continue;
 		}
 		let mut words = line.split(' ');
-		match words.next().unwrap() { // Will never panic because we've already checked it's not empty
+		// .unwrap() will never panic because we've already checked it's not empty
+		match words.next().unwrap() {
 			"SEND" => send(line, words, &vars),
 			"SET" => vars.set(line, words),
 			"DECLARE" => vars.declare(line, words),
@@ -77,20 +78,26 @@ impl Variables {
 	}
 	/// DECLARE found AS BOOLEAN INITIALLY false
 	fn declare(&mut self, line: &str, mut words: core::str::Split<char>) {
-		let key = words.next().unwrap().to_string();
+		let key = words
+			.next()
+			.expect("Syntax Error: DECLARE must have a variable after")
+			.to_string();
 		let my_type = match words.next() {
 			Some("AS") => Some(words.next().unwrap()),
-			Some("INITIALLY") =>(None),
-			_ => panic!("Syntax Error: DECLARE must always have a AS")
+			Some("INITIALLY") => None,
+			_ => panic!("Syntax Error: DECLARE must always have a AS"),
 		};
 
 		const INITIALLY_LEN: usize = 11; // " INITIALLY "
 		const DECLARE_AS_LEN: usize = 12 + INITIALLY_LEN; // "DECLARE ... AS" + " INITIALLY "
 		let var_len = key.len();
 		let value = match my_type {
-			Some("STRING") => Types::String(evaluate_as_str(&line[DECLARE_AS_LEN + var_len + 6..], self)),
+			Some("STRING") => {
+				let expr = &line[DECLARE_AS_LEN + var_len + 6..]; // "STRING".len() == 6
+				Types::String(evaluate_as_str(expr, self))
+			}
 			Some(invalid_type) => panic!("Unknown type {invalid_type}"),
-			None => todo!("Dynamic eval")
+			None => todo!("Dynamic eval"),
 		};
 
 		self.vars.insert(key, value);
