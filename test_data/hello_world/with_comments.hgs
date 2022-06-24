@@ -1,0 +1,8 @@
+# A comment is what this is
+# It is indeed
+SEND "Hello World" TO DISPLAY
+# and more comments
+# and another one for good measure
+
+# with a newline
+# and another comment
