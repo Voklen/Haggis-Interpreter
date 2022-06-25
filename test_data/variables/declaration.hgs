@@ -1,0 +1,7 @@
+# a comment
+# another comment
+DECLARE x AS STRING INITIALLY "Hello from x"
+DECLARE y AS STRING INITIALLY "Hello from y"
+SEND y TO DISPLAY
+SEND "Hello World" TO DISPLAY
+SEND x TO DISPLAY

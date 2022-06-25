@@ -78,6 +78,25 @@
 			},
 			"args": [],
 			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug integration test 'variables'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--test=variables",
+					"--package=haggis"
+				],
+				"filter": {
+					"name": "variables",
+					"kind": "test"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
 		}
 	]
 }

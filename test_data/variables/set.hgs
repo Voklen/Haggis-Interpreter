@@ -1,0 +1,8 @@
+# a comment
+# another comment
+DECLARE x AS STRING INITIALLY "Hello from x"
+DECLARE y AS STRING INITIALLY "Hello from y"
+SET x TO "Modified variable x"
+SEND y TO DISPLAY
+SEND "Hello World" TO DISPLAY
+SEND x TO DISPLAY
