@@ -45,7 +45,7 @@ fn evaluate_as_str<'a>(input: &'a str, vars: &'a Variables) -> String {
 		.expect("Syntax error: Field cannot be empty");
 
 	if (first_char != quote) | (last_char != quote) {
-		return vars.get_str(input);
+		return vars.get_str(input).clone();
 	}
 
 	// At this point all checks have been passed and this is a string surrounded by quotes
@@ -53,8 +53,17 @@ fn evaluate_as_str<'a>(input: &'a str, vars: &'a Variables) -> String {
 	input[1..input.len() - 1].to_string()
 }
 
+fn evaluate_as_int<'a>(input: &'a str, vars: &'a Variables) -> i64 {
+	match input.parse::<i64>() {
+		Ok(number) => return number,
+		Err(_) => {}
+	};
+	*vars.get_int(input)
+}
+
 enum Types {
 	String(String),
+	Integer(i64),
 }
 
 struct Variables {
@@ -86,6 +95,10 @@ impl Variables {
 				let expr = &line[DECLARE_AS_LEN + var_len + 6..]; // "STRING".len() == 6
 				Types::String(evaluate_as_str(expr, self))
 			}
+			Some("INTEGER") => {
+				let expr = &line[DECLARE_AS_LEN + var_len + 7..]; // "INTEGER".len() == 7
+				Types::Integer(evaluate_as_int(expr, self))
+			}
 			Some(invalid_type) => panic!("Unknown type {invalid_type}"),
 			None => todo!("Dynamic eval"),
 		};
@@ -106,10 +119,17 @@ impl Variables {
 		let value = Types::String(set_value);
 		self.vars.insert(key, value);
 	}
-	fn get_str(&self, key: &str) -> String {
+	fn get_str(&self, key: &str) -> &String {
 		match self.vars.get(key) {
-			Some(Types::String(string)) => string.into(),
+			Some(Types::String(string)) => string,
 			Some(_) => panic!("{key} is not a string"),
+			None => panic!("Syntax error: no variable {key}"),
+		}
+	}
+	fn get_int(&self, key: &str) -> &i64 {
+		match self.vars.get(key) {
+			Some(Types::Integer(int)) => int,
+			Some(_) => panic!("{key} is not an integer"),
 			None => panic!("Syntax error: no variable {key}"),
 		}
 	}

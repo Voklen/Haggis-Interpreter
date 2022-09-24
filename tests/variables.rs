@@ -15,6 +15,12 @@ macro_rules! gen_test {
 fn declaration() {
 	gen_test!("declaration.hgs");
 }
+
+#[test]
+fn int_declaration() {
+	gen_test!("int_declaration.hgs");
+}
+
 #[test]
 fn set() {
 	gen_test!("set.hgs");
