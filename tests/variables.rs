@@ -25,3 +25,8 @@ fn int_declaration() {
 fn set() {
 	gen_test!("set.hgs");
 }
+
+#[test]
+fn int_set() {
+	gen_test!("int_set.hgs");
+}

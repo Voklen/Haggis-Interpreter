@@ -112,11 +112,12 @@ impl Variables {
 			panic!("Syntax Error: SEND must always have a TO")
 		}
 
-		if !self.vars.contains_key(&key) {
-			panic!("Variable Error: Variable {key} is not declared")
-		}
-		let set_value = evaluate_as_str(&line[key.len() + 8..], self); // The +8 is the SET ... TO
-		let value = Types::String(set_value);
+		let evaluation_section = &line[key.len() + 8..]; // The +8 is the SET ... TO
+		let value = match self.vars.get(&key) {
+			Some(Types::String(_)) => Types::String(evaluate_as_str(evaluation_section, self)),
+			Some(Types::Integer(_)) => Types::Integer(evaluate_as_int(evaluation_section, self)),
+			None => panic!("Variable Error: Variable {key} is not declared")
+		};
 		self.vars.insert(key, value);
 	}
 	fn get_str(&self, key: &str) -> &String {
