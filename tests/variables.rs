@@ -6,7 +6,7 @@ const DIRECTORY: &str = "test_data/variables/";
 macro_rules! gen_test {
 	($file:expr) => {
 		let contents = read_to_string(format!("{}{}", DIRECTORY, $file)).unwrap();
-	run_haggis(contents);
+		run_haggis(contents);
 	};
 }
 

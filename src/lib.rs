@@ -116,7 +116,7 @@ impl Variables {
 		let value = match self.vars.get(&key) {
 			Some(Types::String(_)) => Types::String(evaluate_as_str(evaluation_section, self)),
 			Some(Types::Integer(_)) => Types::Integer(evaluate_as_int(evaluation_section, self)),
-			None => panic!("Variable Error: Variable {key} is not declared")
+			None => panic!("Variable Error: Variable {key} is not declared"),
 		};
 		self.vars.insert(key, value);
 	}
