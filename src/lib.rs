@@ -32,7 +32,7 @@ fn is_comment_or_empty(line: &str) -> bool {
 EXPRESSION EVALUATIONS
 */
 
-fn evaluate_as_str<'a>(input: &'a str, vars: &'a Variables) -> String {
+fn evaluate_as_str(input: &str, vars: &Variables) -> String {
 	let quote = '"';
 
 	let first_char = input
@@ -53,7 +53,7 @@ fn evaluate_as_str<'a>(input: &'a str, vars: &'a Variables) -> String {
 	input[1..input.len() - 1].to_string()
 }
 
-fn evaluate_as_int<'a>(input: &'a str, vars: &'a Variables) -> i64 {
+fn evaluate_as_int(input: &str, vars: &Variables) -> i64 {
 	match input.parse::<i64>() {
 		Ok(number) => return number,
 		Err(_) => {}
